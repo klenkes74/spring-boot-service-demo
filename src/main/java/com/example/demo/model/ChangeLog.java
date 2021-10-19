@@ -1,6 +1,7 @@
 package com.example.demo.model;
 
-import com.github.javafaker.Faker;
+import io.micrometer.core.annotation.Timed;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,14 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author rlichti
@@ -32,43 +28,24 @@ import java.util.concurrent.atomic.AtomicLong;
 @ToString
 @EqualsAndHashCode
 @Slf4j
-public class ChangeLog implements Serializable, Comparator<ChangeLog> {
-    private static final AtomicLong counter = new AtomicLong(0);
-    private static final Faker faker = new Faker();
-
+@Timed
+@Schema(
+        name = "ChangeLog",
+        description = "A single changelog entry"
+)
+public class ChangeLog implements Serializable {
+    @Schema(description = "Database row_id of the changelog entry", required = true)
     private Long id;
+    @Schema(description = "UUID of the entry", required = true)
     private UUID uuid;
+    @Schema(description = "Timestamp of the change", required = true)
     private LocalDateTime timestamp;
+    @Schema(description = "Type of change", required = true, enumAsRef = true)
     private ChangeLogAction method;
+    @Schema(description = "User who committed this change", required = true)
     private String user;
 
+    @Schema(description = "The attributes changed", required = true, minLength = 1, maxLength = 50)
     @Builder.Default
     private final Map<String, String> attributes = new HashMap<>();
-
-    public static ChangeLog random() {
-        return ChangeLog.builder()
-                .withId(counter.addAndGet(1))
-                .withUuid(UUID.randomUUID())
-                .withTimestamp(LocalDateTime.now().minusMinutes(new Random().nextInt(1000)))
-                .withMethod(ChangeLogAction.random())
-                .withUser(faker.name().username())
-                .withAttributes(randomAttributes("key1", "key2", "key3"))
-                .build();
-    }
-
-    private static Map<String, String> randomAttributes(String... keys) {
-        HashMap<String, String> result = new HashMap<>(keys.length);
-
-        for (String key : keys) {
-            result.put(key, faker.gameOfThrones().house());
-        }
-
-        return result;
-    }
-
-    @Override
-    public int compare(ChangeLog changeLog, ChangeLog t1) {
-        // sort reverse!
-        return t1.getTimestamp().compareTo(changeLog.getTimestamp());
-    }
 }

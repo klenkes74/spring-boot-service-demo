@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,7 +33,10 @@ import java.util.stream.Collectors;
  * @since 1.0.0 2021-10-18
  */
 @RestController
-@RequestMapping(produces = { MediaType.APPLICATION_JSON })
+@RequestMapping(
+        path = "/api/work",
+        produces = { MediaType.APPLICATION_JSON }
+)
 @RequiredArgsConstructor(onConstructor = @__(@Inject))
 @CrossOrigin(origins = "http://localhost:9090")
 @Timed
@@ -43,10 +45,8 @@ import java.util.stream.Collectors;
 public class DemoController {
     private final ChangelogService changelogService;
 
-    @GetMapping(
-            path = "/api/changelog",
-            produces = { MediaType.APPLICATION_JSON }
-    )
+    @Timed
+    @GetMapping(path = "changelog")
     @Secured("USER")
     @Operation(
             summary = "Loads the changelog",
@@ -54,7 +54,7 @@ public class DemoController {
             security = @SecurityRequirement(name = "basicAuth")
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Pong succeeded"),
+            @ApiResponse(responseCode = "200", description = "List of matching changelog entries found"),
             @ApiResponse(responseCode = "401", description = "Unauthorized Access"),
             @ApiResponse(responseCode = "404", description = "Not found?")
     })
@@ -75,10 +75,8 @@ public class DemoController {
         }
     }
 
-    @PostMapping(
-            path = "/api/start",
-            produces = { MediaType.APPLICATION_JSON}
-    )
+    @Timed
+    @PostMapping(path = "start")
     @Secured("USER")
     @Operation(
             summary = "Starts the process",
@@ -86,9 +84,8 @@ public class DemoController {
             security = @SecurityRequirement(name = "basicAuth")
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Pong succeeded"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized Access"),
-            @ApiResponse(responseCode = "404", description = "Not found?")
+            @ApiResponse(responseCode = "200", description = "Process started"),
+            @ApiResponse(responseCode = "403", description = "Unauthorized Access")
     })
     public StartAck start(
             @Parameter(name = "end", description = "Last timestamp to work with", example = "2021-10-17T18:23:15.001232")
@@ -98,6 +95,7 @@ public class DemoController {
         if (end == null) {
             end = LocalDateTime.now();
         }
+        log.info("Start requested for entries prior: {}", end);
 
         List<ChangeLog> list = changelogService.getEarlierEntries(end);
         Set<Long> ids = list.stream().map(ChangeLog::getId).collect(Collectors.toSet());

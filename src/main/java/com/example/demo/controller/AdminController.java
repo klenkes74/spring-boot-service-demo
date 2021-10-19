@@ -29,6 +29,7 @@ public class AdminController {
     @Value("${spring.application.name}")
     private String appName;
 
+    @Timed
     @GetMapping(
             path = "/api/admin/ping",
             produces = { MediaType.TEXT_PLAIN }
@@ -52,6 +53,7 @@ public class AdminController {
         }
     }
 
+    @Timed
     @GetMapping(
             path = "/api/admin/application",
             produces = { MediaType.TEXT_PLAIN }
