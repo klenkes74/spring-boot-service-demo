@@ -1,6 +1,5 @@
 package com.example.demo.model;
 
-import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +27,6 @@ import java.util.UUID;
 @ToString
 @EqualsAndHashCode
 @Slf4j
-@Timed
 @Schema(
         name = "ChangeLog",
         description = "A single changelog entry"
