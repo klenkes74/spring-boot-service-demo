@@ -1,0 +1,29 @@
+---
+api:
+  description: @project.description@
+  version: @project.version@
+  docs:
+    url: http://irgendwo
+    description: Documentation for @project.name@
+
+spring:
+  application:
+    name: @project.name@
+  datasource:
+    url: jdbc:h2:~/data;DB_CLOSE_ON_EXIT=TRUE;AUTO_RECONNECT=TRUE;AUTO_SERVER=TRUE
+
+springdoc:
+  use-management-port: true
+  show-actuator: true
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+management:
+  server:
+    port: 9090
+  endpoints:
+    web:
+      exposure:
+        include: openapi, swaggerui, prometheus, health, info, metrics

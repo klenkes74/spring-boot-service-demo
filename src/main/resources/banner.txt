@@ -1,0 +1,9 @@
+================================================================================
+Demo Service: @project.name@
+
+Artifact:
+Group-ID: @project.groupId@
+Artifact-Id: @project.artifactId@
+Version: @project.version@
+================================================================================
+
